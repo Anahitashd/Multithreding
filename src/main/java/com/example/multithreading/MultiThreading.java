@@ -44,5 +44,15 @@ public class MultiThreading {
 
         t1.start();
         t2.start();
+
+        // we can wait for the thread to finish: join()
+
+        try {
+            t1.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e) ;
+        }
+
+        System.out.println("Finished with threads...");
     }
 }
