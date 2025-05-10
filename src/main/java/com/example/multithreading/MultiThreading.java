@@ -39,6 +39,9 @@ public class MultiThreading {
     public static void main(String[] args) {
         SpringApplication.run(MultiThreading.class, args);
 
+        String name= Thread.currentThread().getName();
+        System.out.println(name);
+
         Thread t1 = new Thread(new Runner1());
         Thread t2 = new Thread(new Runner2());
 
