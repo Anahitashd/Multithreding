@@ -3,33 +3,21 @@ package com.example.multithreading;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-class Runner1 extends Thread {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
-    @Override
-    public void run() {
-        for (int i = 0; i < 10; i++) {
-            try {
-                Thread.sleep(1000);
-            }catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Runner1: "+i);
-        }
+class Processor implements Callable<String> {
+
+    private int id;
+    public Processor(int id) {
+        this.id = id;
     }
-}
-
-class Runner2 extends Thread {
 
     @Override
-    public void run() {
-        for (int i = 0; i < 10; i++) {
-            try {
-                Thread.sleep(1000);
-            }catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Runner2: "+i);
-        }
+    public String call() throws Exception {
+        Thread.sleep(2000);
+        return "Id: " + id;
     }
 }
 
@@ -37,25 +25,19 @@ class Runner2 extends Thread {
 @SpringBootApplication
 public class MultiThreading {
     public static void main(String[] args) {
-        SpringApplication.run(MultiThreading.class, args);
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        List<Future<String>> list = new ArrayList<>();
 
-        String name= Thread.currentThread().getName();
-        System.out.println(name);
-
-        Thread t1 = new Thread(new Runner1());
-        Thread t2 = new Thread(new Runner2());
-
-        t1.start();
-        t2.start();
-
-        // we can wait for the thread to finish: join()
-
-        try {
-            t1.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e) ;
+        for (int i = 0; i < 10; i++) {
+            Future<String> future = service.submit(new Processor(i+1));
+            list.add (future);
         }
-
-        System.out.println("Finished with threads...");
+        for (Future<String> future : list) {
+            try {
+                System.out.println(future.get());
+            }catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
